@@ -16,7 +16,7 @@ export function ImageUploader() {
 				secure_url: url,
 				public_id: publicId,
 			} = await cloudinary.uploader.upload(imageFile, {
-				folder: 'memories-app',
+				folder: process.env.MEMORIES_CLOUDINARY_FOLDER_NAME,
 			});
 			return { url, publicId };
 		} catch (e) {
