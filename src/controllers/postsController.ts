@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import { logger } from '../startup/logging';
 import PostMessage from '../models/postMessage';
 import { ImageUploader, UploaderResponse } from '../models/imageUploader';
+import { getFileSizeInKB } from '../utils/systemUtils';
 
 const router = Router();
 
@@ -24,8 +25,14 @@ router.post('/', async (req: Request, res: Response) => {
 	try {
 		let uploaderRes: UploaderResponse = {};
 
-		if (req.body.imageFile) {
-			uploaderRes = await ImageUploader().uploadImage(req.body.imageFile);
+		const imageBase64 = post.imageBase64;
+		if (!isImageFileSizeAcceptable(imageBase64)) {
+			return res
+				.status(400)
+				.json('Filesize of the image exceeds the limit');
+		}
+		if (imageBase64) {
+			uploaderRes = await ImageUploader().uploadImage(imageBase64);
 		}
 
 		if (uploaderRes.error) {
@@ -53,13 +60,17 @@ router.patch('/:id', async (req: Request, res: Response) => {
 	if (!mongoose.Types.ObjectId.isValid(_id))
 		return res.status(404).send(`No post with id ${_id}`);
 
+	if (!isImageFileSizeAcceptable(updatedPost.imageBase64)) {
+		return res.status(400).json('Filesize of the image exceeds the limit');
+	}
+
 	const { imagePublicId: oldImagePublicId } = (await PostMessage.findById(
 		_id
 	).select(['imagePublicId'])) as any;
 
-	if (req.body.imageFile) {
+	if (updatedPost.imageBase64) {
 		const uploaderResponse = await ImageUploader().updateImage(
-			req.body.imageFile,
+			updatedPost.imageBase64,
 			oldImagePublicId
 		);
 		updatedPost.imageUrl = uploaderResponse.url;
@@ -104,5 +115,13 @@ router.patch('/:id/like', async (req: Request, res: Response) => {
 
 	res.json(updatedPost);
 });
+
+function isImageFileSizeAcceptable(base64String: string | undefined) {
+	const MAX_ALLOWED_FILE_SIZE_IN_KB = 2000;
+	return (
+		base64String === undefined ||
+		getFileSizeInKB(base64String) <= MAX_ALLOWED_FILE_SIZE_IN_KB
+	);
+}
 
 export default router;
