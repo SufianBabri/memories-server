@@ -26,14 +26,17 @@ router.post('/', async (req: Request, res: Response) => {
 		let uploaderRes: UploaderResponse = {};
 
 		const imageBase64 = post.imageBase64;
+		if (!imageBase64) {
+			return res.status(400).json('No image sent!');
+		}
+
 		if (!isImageFileSizeAcceptable(imageBase64)) {
 			return res
 				.status(400)
 				.json('Filesize of the image exceeds the limit');
 		}
-		if (imageBase64) {
-			uploaderRes = await ImageUploader().uploadImage(imageBase64);
-		}
+
+		uploaderRes = await ImageUploader().uploadImage(imageBase64);
 
 		if (uploaderRes.error) {
 			return res.status(400).json(uploaderRes.error);
@@ -90,6 +93,10 @@ router.delete('/:id', async (req: Request, res: Response) => {
 		return res.status(404).send(`No post with id ${id}`);
 
 	await PostMessage.findByIdAndDelete(id, async (err, doc) => {
+		if (!doc) {
+			return res.json({ message: 'Post deleted successfully' });
+		}
+
 		const imagePublicId = (doc as any).imagePublicId;
 		if (imagePublicId) {
 			await ImageUploader().deleteImage(imagePublicId);
