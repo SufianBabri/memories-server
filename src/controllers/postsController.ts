@@ -92,18 +92,22 @@ router.delete('/:id', async (req: Request, res: Response) => {
 	if (!mongoose.Types.ObjectId.isValid(id))
 		return res.status(404).send(`No post with id ${id}`);
 
-	await PostMessage.findByIdAndDelete(id, async (err, doc) => {
-		if (!doc) {
-			return res.json({ message: 'Post deleted successfully' });
-		}
+	await PostMessage.findByIdAndDelete(
+		id,
+		null,
+		async (err: any, doc: any) => {
+			if (!doc) {
+				return res.json({ message: 'Post deleted successfully' });
+			}
 
-		const imagePublicId = (doc as any).imagePublicId;
-		if (imagePublicId) {
-			await ImageUploader().deleteImage(imagePublicId);
-		}
+			const imagePublicId = (doc as any).imagePublicId;
+			if (imagePublicId) {
+				await ImageUploader().deleteImage(imagePublicId);
+			}
 
-		res.json({ message: 'Post deleted successfully' });
-	});
+			res.json({ message: 'Post deleted successfully' });
+		}
+	);
 });
 
 router.patch('/:id/like', async (req: Request, res: Response) => {
