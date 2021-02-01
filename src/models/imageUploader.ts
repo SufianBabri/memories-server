@@ -39,9 +39,9 @@ export function ImageUploader() {
 		newImageFile: string,
 		oldPublicId: string
 	): Promise<UploaderResponse> => {
-		const imageUrl = await uploadImage(newImageFile);
+		const image = await uploadImage(newImageFile);
 		await deleteImage(oldPublicId);
-		return imageUrl;
+		return image;
 	};
 
 	return {

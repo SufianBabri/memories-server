@@ -44,7 +44,7 @@ router.post('/', async (req: Request, res: Response) => {
 
 		const newPost = new PostMessage({
 			...post,
-			imageUrl: uploaderRes.url,
+			image: uploaderRes.url,
 			imagePublicId: uploaderRes.publicId,
 		});
 		await newPost.save();
@@ -76,7 +76,7 @@ router.patch('/:id', async (req: Request, res: Response) => {
 			updatedPost.imageBase64,
 			oldImagePublicId
 		);
-		updatedPost.imageUrl = uploaderResponse.url;
+		updatedPost.image = uploaderResponse.url;
 		updatedPost.imagePublicId = uploaderResponse.publicId;
 	}
 
