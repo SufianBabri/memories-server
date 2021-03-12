@@ -1,4 +1,4 @@
-import { Express } from 'express';
+import {Express} from 'express';
 import morgan from 'morgan';
 import * as Sentry from '@sentry/node';
 import 'express-async-errors';
@@ -10,12 +10,12 @@ export const logger = Tracer.dailyfile({
 	allLogsFileName: 'daily-log',
 	inspectOpt: {
 		showHidden: false,
-		depth: null,
+		depth: null
 	},
-	maxLogFiles: 90,
+	maxLogFiles: 10,
 	transport: function (data) {
 		console.log(data.message);
-	},
+	}
 });
 
 const uncaughtExceptionsLogger = Tracer.console({
@@ -29,7 +29,7 @@ const uncaughtExceptionsLogger = Tracer.console({
 				process.exit(1);
 			}
 		);
-	},
+	}
 });
 
 process.on('unhandledRejection', (reason, promise) => {
@@ -49,6 +49,6 @@ export function logging(app: Express) {
 
 	Sentry.init({
 		environment,
-		dsn: process.env.MEMORIES_SENTRY_DSN,
+		dsn: process.env.MEMORIES_SENTRY_DSN
 	});
 }
