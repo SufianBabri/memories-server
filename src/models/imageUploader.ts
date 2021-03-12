@@ -1,11 +1,11 @@
-import { UploadResponseCallback, v2 as cloudinary } from 'cloudinary';
-import { logger } from '../startup/logging';
+import {v2 as cloudinary} from 'cloudinary';
+import {logger} from '../startup/logging';
 
 export function ImageUploader() {
 	cloudinary.config({
 		cloud_name: process.env.MEMORIES_CLOUDINARY_CLOUD_NAME,
 		api_key: process.env.MEMORIES_CLOUDINARY_API_KEY,
-		api_secret: process.env.MEMORIES_CLOUDINARY_API_SECRET,
+		api_secret: process.env.MEMORIES_CLOUDINARY_API_SECRET
 	});
 
 	const uploadImage = async (
@@ -14,14 +14,14 @@ export function ImageUploader() {
 		try {
 			const {
 				secure_url: url,
-				public_id: publicId,
+				public_id: publicId
 			} = await cloudinary.uploader.upload(imageFile, {
-				folder: process.env.MEMORIES_CLOUDINARY_FOLDER_NAME,
+				folder: process.env.MEMORIES_CLOUDINARY_FOLDER_NAME
 			});
-			return { url, publicId };
+			return {url, publicId};
 		} catch (e) {
 			logger.error(e);
-			return { error: 'Could not upload the image' };
+			return {error: 'Could not upload the image'};
 		}
 	};
 
@@ -47,7 +47,7 @@ export function ImageUploader() {
 	return {
 		uploadImage,
 		deleteImage,
-		updateImage,
+		updateImage
 	};
 }
 

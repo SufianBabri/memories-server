@@ -64,7 +64,7 @@ router.post('/', async (req: Request, res: Response) => {
 });
 
 router.delete('/:id', async (req: Request, res: Response) => {
-	const { id } = req.params;
+	const {id} = req.params;
 
 	if (!mongoose.Types.ObjectId.isValid(id))
 		return res.status(404).send(`No post with id ${id}`);
@@ -74,21 +74,21 @@ router.delete('/:id', async (req: Request, res: Response) => {
 		null,
 		async (err: any, doc: any) => {
 			if (!doc) {
-				return res.json({ message: 'Post deleted successfully' });
+				return res.json({message: 'Post deleted successfully'});
 			}
 
-			const imagePublicId = (doc as any).imagePublicId;
+			const imagePublicId = (doc as any).image.publicId;
 			if (imagePublicId) {
 				await ImageUploader().deleteImage(imagePublicId);
 			}
 
-			res.json({ message: 'Post deleted successfully' });
+			res.json({message: 'Post deleted successfully'});
 		}
 	);
 });
 
 router.patch('/:id/like', async (req: Request, res: Response) => {
-	const { id } = req.params;
+	const {id} = req.params;
 
 	if (!mongoose.Types.ObjectId.isValid(id))
 		return res.status(404).send(`No post with id ${id}`);
@@ -96,9 +96,9 @@ router.patch('/:id/like', async (req: Request, res: Response) => {
 	const updatedPost = await PostMessage.findByIdAndUpdate(
 		id,
 		{
-			$inc: { likeCount: 1 },
+			$inc: {likeCount: 1}
 		},
-		{ new: true }
+		{new: true}
 	);
 
 	res.json(updatedPost);

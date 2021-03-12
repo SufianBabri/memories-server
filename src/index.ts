@@ -1,6 +1,6 @@
 import express from 'express';
 import dotenvFlow from 'dotenv-flow';
-import { logging, logger } from './startup/logging';
+import {logger, logging} from './startup/logging';
 import prod from './startup/prod';
 import routes from './startup/routes';
 import db from './startup/db';
