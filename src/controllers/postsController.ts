@@ -56,36 +56,6 @@ router.post('/', async (req: Request, res: Response) => {
 	}
 });
 
-router.patch('/:id', async (req: Request, res: Response) => {
-	const { id: _id } = req.params;
-	const updatedPost = req.body;
-
-	if (!mongoose.Types.ObjectId.isValid(_id))
-		return res.status(404).send(`No post with id ${_id}`);
-
-	if (!isImageFileSizeAcceptable(updatedPost.imageBase64)) {
-		return res.status(400).json('Filesize of the image exceeds the limit');
-	}
-
-	const { imagePublicId: oldImagePublicId } = (await PostMessage.findById(
-		_id
-	).select(['imagePublicId'])) as any;
-
-	if (updatedPost.imageBase64) {
-		const uploaderResponse = await ImageUploader().updateImage(
-			updatedPost.imageBase64,
-			oldImagePublicId
-		);
-		updatedPost.image = uploaderResponse.url;
-		updatedPost.imagePublicId = uploaderResponse.publicId;
-	}
-
-	await PostMessage.findByIdAndUpdate(_id, updatedPost, {
-		new: true,
-	});
-	res.json(updatedPost);
-});
-
 router.delete('/:id', async (req: Request, res: Response) => {
 	const { id } = req.params;
 
