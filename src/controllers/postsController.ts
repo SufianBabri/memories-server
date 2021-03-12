@@ -1,22 +1,25 @@
-import { Request, Response, Router } from 'express';
+import {Request, Response, Router} from 'express';
 import mongoose from 'mongoose';
-import { logger } from '../startup/logging';
+import * as _ from 'underscore';
+import {logger} from '../startup/logging';
 import PostMessage from '../models/postMessage';
-import { ImageUploader, UploaderResponse } from '../models/imageUploader';
-import { getFileSizeInKB } from '../utils/systemUtils';
+import {ImageUploader, UploaderResponse} from '../models/imageUploader';
+import {getFileSizeInKB} from '../utils/systemUtils';
 
 const router = Router();
 
 router.get('/', async (req: Request, res: Response) => {
 	try {
-		const postMessages = await PostMessage.find().select([
-			'-imagePublicId',
-		]);
+		const postMessages = await PostMessage.find().select(['-image.publicId', '-__v']);
+
+		_.each(postMessages, (p: any) => {
+			return p.image = p.image.url;
+		});
 
 		res.status(200).json(postMessages);
 	} catch (e) {
 		logger.error(e);
-		res.status(404).json({ message: e.message });
+		res.status(404).json({message: e.message});
 	}
 });
 
