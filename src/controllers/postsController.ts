@@ -47,15 +47,19 @@ router.post('/', async (req: Request, res: Response) => {
 
 		const newPost = new PostMessage({
 			...post,
-			image: uploaderRes.url,
-			imagePublicId: uploaderRes.publicId,
+			image: {
+				url: uploaderRes.url,
+				publicId: uploaderRes.publicId
+			}
 		});
 		await newPost.save();
 
-		res.status(200).json(newPost);
+		(newPost as any).image = (newPost as any).image.url;
+
+		res.status(200).json(_.omit(newPost.toJSON(), ['__v']));
 	} catch (e) {
 		logger.error(e);
-		res.status(400).json({ message: e.message });
+		res.status(400).json({message: e.message});
 	}
 });
 
